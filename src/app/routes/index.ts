@@ -1,15 +1,22 @@
-import express from 'express';
+import { Router } from "express";
+import UserRoutes from "../modules/user/user.routes";
 
+// Initialize main router
+const router = Router();
 
-const router = express.Router();
-
+// List of route configs
 const moduleRoutes = [
-    {
-        path: '/',
-        route: router
-    }
+  {
+    path: "/user",
+    route: UserRoutes,
+  },
 ];
 
-moduleRoutes.forEach(route => router.use(route.path, route.route))
+// Register all routes
+moduleRoutes.forEach((route) => {
+  router.use(route.path, route.route);
+});
 
-export default router;
+// Export main router
+const ModuleRouter = router;
+export default ModuleRouter;
