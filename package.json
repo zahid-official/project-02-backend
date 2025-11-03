@@ -7,6 +7,9 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts"
   },
+  "prisma": {
+    "schema": "./prisma/schema"
+  },
   "dependencies": {
     "@prisma/client": "^6.18.0",
     "cors": "^2.8.5",
