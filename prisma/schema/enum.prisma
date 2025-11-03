@@ -1,0 +1,19 @@
+// Enum for Role
+enum UserRole {
+    ADMIN
+    DOCTOR
+    PATIENT
+}
+
+// Enum for Status
+enum UserStatus {
+    ACTIVE
+    INACTIVE
+    DELETED
+}
+
+// Enum for Gender
+enum Gender {
+    MALE
+    FEMALE
+}

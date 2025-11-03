@@ -1,0 +1,71 @@
+// Create user schema model
+model User {
+    id                 String     @id @default(uuid())
+    email              String     @unique
+    password           String
+    role               UserRole   @default(PATIENT)
+    status             UserStatus @default(ACTIVE)
+    needChangePassword Boolean    @default(true)
+    createdAt          DateTime   @default(now())
+    updatedAt          DateTime   @updatedAt
+    admin              Admin?
+    doctor             Doctor?
+    patient            Patient?
+
+    @@map("users")
+}
+
+// Create admin schema model
+model Admin {
+    id            String   @id @default(uuid())
+    name          String
+    email         String   @unique
+    profilePhoto  String?
+    contactNumber String
+    isDeleted     Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    user          User     @relation(fields: [email], references: [email])
+
+    @@map("admins")
+}
+
+// Create doctor schema model
+model Doctor {
+    id                  String   @id @default(uuid())
+    name                String
+    email               String   @unique
+    gender              Gender
+    profilePhoto        String?
+    address             String
+    contactNumber       String
+    registrationNumber  String
+    appointmentFee      Int
+    experience          Int      @default(0)
+    qualification       String
+    designation         String
+    currentWorkingPlace String
+    isDeleted           Boolean  @default(false)
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+    user                User     @relation(fields: [email], references: [email])
+
+    @@map("doctors")
+}
+
+// Create patient schema model
+model Patient {
+    id            String   @id @default(uuid())
+    name          String
+    email         String   @unique
+    gender        Gender
+    profilePhoto  String?
+    address       String
+    contactNumber String
+    isDeleted     Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    user          User     @relation(fields: [email], references: [email])
+
+    @@map("patients")
+}
