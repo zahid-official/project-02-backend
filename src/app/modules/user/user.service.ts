@@ -1,7 +1,7 @@
 import { Patient, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import config from "../../../config";
-import prisma from "../../../config/prisma";
+import config from "../../config";
+import prisma from "../../config/prisma";
 import { CreatePatient } from "./user.interface";
 
 // Create patient
@@ -15,21 +15,21 @@ const createPatient = async (payload: CreatePatient) => {
     // Create user
     await transactionId.user.create({
       data: {
-        email: payload?.email,
+        email: payload?.patient?.email,
         password: hashedPassword,
       },
     });
 
     // Create patient
-    const patient = await transactionId.patient.create({
+    return await transactionId.patient.create({
       data: {
-        name: payload?.name,
-        email: payload?.email,
+        name: payload?.patient?.name,
+        email: payload?.patient?.email,
         gender: "MALE",
-        phone: payload?.phone,
+        phone: payload?.patient?.phone,
+        profilePhoto: payload?.patient?.profilePhoto,
       },
     });
-    return patient;
   });
 
   return result;

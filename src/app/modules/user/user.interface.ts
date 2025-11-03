@@ -1,7 +1,12 @@
 // Interface for create patient
 export interface CreatePatient {
-  name: string;
-  email: string;
+  patient: {
+    name: string;
+    email: string;
+    phone: string;
+    gender: "MALE" | "FEMALE";
+    address?: string;
+    profilePhoto?: string;
+  };
   password: string;
-  phone: string;
 }
