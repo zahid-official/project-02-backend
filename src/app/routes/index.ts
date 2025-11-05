@@ -1,6 +1,7 @@
 import { Router } from "express";
-import UserRoutes from "../modules/user/user.routes";
+import PatientRoutes from "../modules/patient/patient.routes";
 import AuthRoutes from "../modules/auth/auth.routes";
+import AdminRoutes from "../modules/admin/admin.routes";
 
 // Initialize main router
 const router = Router();
@@ -8,8 +9,12 @@ const router = Router();
 // List of route configs
 const moduleRoutes = [
   {
-    path: "/user",
-    route: UserRoutes,
+    path: "/patient",
+    route: PatientRoutes,
+  },
+  {
+    path: "/admin",
+    route: AdminRoutes,
   },
   {
     path: "/auth",

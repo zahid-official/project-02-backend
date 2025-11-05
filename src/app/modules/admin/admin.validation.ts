@@ -1,8 +1,9 @@
+import { Gender } from "@prisma/client";
 import z from "zod";
 
-// Create patient schema
-export const createPatientZodSchema = z.object({
-  patient: z.object({
+// Create admin schema
+export const createAdminZodSchema = z.object({
+  admin: z.object({
     // Name
     name: z
       .string({
@@ -26,6 +27,9 @@ export const createPatientZodSchema = z.object({
       .min(5, { error: "Email must be at least 5 characters long." })
       .max(100, { error: "Email cannot exceed 100 characters." })
       .trim(),
+
+    // Gender
+    gender: z.enum(Object.values(Gender) as [string]),
 
     // Phone
     phone: z

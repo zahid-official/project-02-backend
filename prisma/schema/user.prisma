@@ -20,7 +20,9 @@ model Admin {
     id           String   @id @default(uuid())
     name         String
     email        String   @unique
+    gender       Gender
     phone        String
+    address      String?
     profilePhoto String?
     isDeleted    Boolean  @default(false)
     createdAt    DateTime @default(now())

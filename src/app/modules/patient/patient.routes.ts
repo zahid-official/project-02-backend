@@ -1,20 +1,20 @@
 import { Router } from "express";
-import UserController from "./user.controller";
 import multerUploader from "../../config/multer";
 import { validateZodSchema } from "../../middlewares/validateZodSchema";
-import { createPatientZodSchema } from "./user.validation";
+import PatientController from "./patient.controller";
+import { createPatientZodSchema } from "./patient.validation";
 
 // Initialize router
 const router = Router();
 
 // Post routes
 router.post(
-  "/create-patient",
+  "/create",
   multerUploader.single("file"),
   validateZodSchema(createPatientZodSchema),
-  UserController.createPatient
+  PatientController.createPatient
 );
 
-// Export user routes
-const UserRoutes = router;
-export default UserRoutes;
+// Export patient routes
+const PatientRoutes = router;
+export default PatientRoutes;
