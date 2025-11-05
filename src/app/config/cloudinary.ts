@@ -1,5 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import config from ".";
+import AppError from "../error/AppError";
+import httpStatus from "http-status";
 
 // Cloudinary upload
 export const cloudinaryUpload = async (file: Express.Multer.File) => {
@@ -16,7 +18,10 @@ export const cloudinaryUpload = async (file: Express.Multer.File) => {
       public_id: file.filename,
     })
     .catch((error) => {
-      console.log(error);
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        error.message || "Cloudinary upload failed"
+      );
     });
 
   return uploadResult?.secure_url;
