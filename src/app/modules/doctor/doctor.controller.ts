@@ -8,7 +8,7 @@ import DoctorService from "./doctor.service";
 // Create doctor
 const createDoctor = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.admin.profilePhoto = await cloudinaryUpload(req.file);
+    req.body.doctor.profilePhoto = await cloudinaryUpload(req.file);
   }
   const password = req?.body?.password;
   const body = req?.body?.doctor;

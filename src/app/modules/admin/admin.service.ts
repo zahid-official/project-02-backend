@@ -4,7 +4,7 @@ import config from "../../config";
 import prisma from "../../config/prisma";
 import { IAdmin } from "./admin.interface";
 
-// Admin patient
+// Create admin
 const createAdmin = async (
   payload: IAdmin,
   password: string
