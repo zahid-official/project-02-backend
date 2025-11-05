@@ -8,7 +8,14 @@ import UserService from "./user.service";
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const limit = Number(req?.query?.limit) || 10;
   const page = Number(req?.query?.page) || 1;
-  const result = await UserService.getAllUsers(limit, page);
+  const search = (req?.query?.searchTerm as string) || "";
+
+  const sortBy = req?.query?.sortBy || "createdAt";
+  const sortOrder =
+    (req?.query?.sortOrder as string)?.toLowerCase().trim() === "asc"
+      ? "asc"
+      : "desc";
+  const result = await UserService.getAllUsers(limit, page, search, sortBy, sortOrder);
 
   // Send response
   sendResponse(res, {
