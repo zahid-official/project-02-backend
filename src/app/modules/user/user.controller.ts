@@ -3,27 +3,30 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import UserService from "./user.service";
+import pickFields from "../../utils/pickFields";
 
 // Get user
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const limit = Number(req?.query?.limit) || 10;
-  const page = Number(req?.query?.page) || 1;
-  const search = (req?.query?.searchTerm as string) || "";
+  // Pagination & Sorting Parameters
+  const paginationQueryKeys = ["limit", "page", "sortBy", "sortOrder"];
+  const paginationOptions = pickFields(req?.query, paginationQueryKeys);
 
-  const sortBy = req?.query?.sortBy || "createdAt";
-  const sortOrder =
-    (req?.query?.sortOrder as string)?.toLowerCase().trim() === "asc"
-      ? "asc"
-      : "desc";
-  const result = await UserService.getAllUsers(limit, page, search, sortBy, sortOrder);
+  // Search & Filtering Parameters
+  const filterQueryKeys = ["searchTerm", "status", "role"];
+  const filterOptions = pickFields(req?.query, filterQueryKeys);
+
+  const result = await UserService.getAllUsers(
+    paginationOptions,
+    filterOptions
+  );
 
   // Send response
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "All users retrieved successfully",
-    data: result.data,
-    meta: result.meta,
+    data: result?.data,
+    meta: result?.meta,
   });
 });
 

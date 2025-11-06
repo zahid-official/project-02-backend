@@ -1,34 +1,34 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../config/prisma";
+import paginationHelper from "../../utils/paginationHelper";
+import { IPagination } from "./user.interface";
+import whereClause from "../../utils/whereClause";
 
 // Get all users
 const getAllUsers = async (
-  limit: number,
-  page: number,
-  search: string,
-  sortBy: string,
-  sortOrder: string
+  paginationOptions: IPagination,
+  filterOptions: Record<string, unknown>
 ) => {
-  // Where clause
-  const where: Prisma.UserWhereInput = {
-    email: { contains: search, mode: "insensitive" },
-  };
+  // Pagination options
+  const { limit, page, skip, sortBy, sortOrder } =
+    paginationHelper(paginationOptions);
+
+  // Filter options
+  const searchableFields = ["email"];
+  const where = whereClause(filterOptions, searchableFields);
 
   // Find posts
-  const skip = (page - 1) * limit;
   const result = await prisma.user.findMany({
-    skip,
     take: limit,
+    skip,
     where,
-
-    // Sorting
     orderBy: {
       [sortBy]: sortOrder,
     },
   });
 
-  // pagination
-  const total = await prisma.user.count();
+  // pagination data
+  const total = await prisma.user.count({ where });
   const meta = {
     limit,
     page,
