@@ -1,6 +1,48 @@
 import { addHours, addMinutes, format } from "date-fns";
 import prisma from "../../config/prisma";
 import { ISchedule } from "./schedule.interface";
+import { IPagination } from "../user/user.interface";
+import paginationHelper from "../../utils/paginationHelper";
+import whereClause from "../../utils/whereClause";
+import { Prisma } from "@prisma/client";
+
+// Get all schedules
+const getAllSchedules = async (
+  paginationOptions: IPagination,
+  filterOptions: Record<string, unknown>
+) => {
+  // Pagination options
+  const { limit, page, skip, sortBy, sortOrder } =
+    paginationHelper(paginationOptions);
+
+  // Filter options
+  const where: Prisma.ScheduleWhereInput = {
+    AND: [
+      { startDateTime: { gte: filterOptions?.startDateTime as string } },
+      { endDateTime: { lte: filterOptions?.endDateTime as string } },
+    ],
+  };
+
+  // Find posts
+  const result = await prisma.schedule.findMany({
+    take: limit,
+    skip,
+    where,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+  });
+
+  // pagination data
+  const total = await prisma.schedule.count({ where });
+  const meta = {
+    limit,
+    page,
+    total,
+  };
+
+  return { data: result, meta };
+};
 
 // Create schedule
 const createSchedule = async (payload: ISchedule) => {
@@ -69,6 +111,7 @@ const createSchedule = async (payload: ISchedule) => {
 
 // Schedule service object
 const ScheduleService = {
+  getAllSchedules,
   createSchedule,
 };
 
