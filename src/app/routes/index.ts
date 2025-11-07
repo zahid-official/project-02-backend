@@ -4,6 +4,7 @@ import AuthRoutes from "../modules/auth/auth.routes";
 import AdminRoutes from "../modules/admin/admin.routes";
 import DoctorRoutes from "../modules/doctor/doctor.routes";
 import UserRoutes from "../modules/user/user.routes";
+import ScheduleRoutes from "../modules/schedule/schedule.routes";
 
 // Initialize main router
 const router = Router();
@@ -25,6 +26,10 @@ const moduleRoutes = [
   {
     path: "/user",
     route: UserRoutes,
+  },
+  {
+    path: "/schedule",
+    route: ScheduleRoutes,
   },
   {
     path: "/auth",
