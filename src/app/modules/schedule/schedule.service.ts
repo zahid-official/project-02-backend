@@ -8,11 +8,28 @@ import { ISchedule } from "./schedule.interface";
 // Get all schedules
 const getAllSchedules = async (
   paginationOptions: IPagination,
-  filterOptions: Record<string, unknown>
+  filterOptions: Record<string, unknown>,
+  userEmail: string
 ) => {
   // Pagination options
   const { limit, page, skip, sortBy, sortOrder } =
     paginationHelper(paginationOptions);
+
+  // Filter out doctorScheduleIds
+  const doctorSchedules = await prisma.doctorSchedule.findMany({
+    where: {
+      doctor: {
+        email: userEmail,
+      },
+    },
+    select: {
+      scheduleId: true,
+    },
+  });
+
+  const doctorScheduleIds = doctorSchedules?.map(
+    (schedule) => schedule.scheduleId
+  );
 
   // Filter options
   const where: Prisma.ScheduleWhereInput = {
@@ -20,6 +37,9 @@ const getAllSchedules = async (
       { startDateTime: { gte: filterOptions?.startDateTime as string } },
       { endDateTime: { lte: filterOptions?.endDateTime as string } },
     ],
+    id: {
+      notIn: doctorScheduleIds,
+    },
   };
 
   // Find posts

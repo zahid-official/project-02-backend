@@ -16,9 +16,13 @@ const getAllSchedules = catchAsync(async (req: Request, res: Response) => {
   const filterQueryKeys = ["startDateTime", "endDateTime"];
   const filterOptions = pickFields(req?.query, filterQueryKeys);
 
+  // User email
+  const userEmail = req?.decodedToken?.email;
+
   const result = await ScheduleService.getAllSchedules(
     paginationOptions,
-    filterOptions
+    filterOptions,
+    userEmail
   );
 
   // Send response
