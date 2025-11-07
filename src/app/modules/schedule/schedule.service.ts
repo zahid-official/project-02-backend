@@ -1,10 +1,9 @@
+import { Prisma } from "@prisma/client";
 import { addHours, addMinutes, format } from "date-fns";
 import prisma from "../../config/prisma";
-import { ISchedule } from "./schedule.interface";
-import { IPagination } from "../user/user.interface";
 import paginationHelper from "../../utils/paginationHelper";
-import whereClause from "../../utils/whereClause";
-import { Prisma } from "@prisma/client";
+import { IPagination } from "../user/user.interface";
+import { ISchedule } from "./schedule.interface";
 
 // Get all schedules
 const getAllSchedules = async (
