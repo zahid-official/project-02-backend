@@ -4,6 +4,7 @@ import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
 import config from "./app/config";
 import ModuleRouter from "./app/routes";
+import cookieParser from "cookie-parser";
 
 // Express application
 const app: Application = express();
@@ -11,12 +12,14 @@ const app: Application = express();
 // Middlewares
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [`${config.frontend_url}`],
     credentials: true,
   })
 );
 
+app.use(cookieParser());
 app.use(express.json());
+app.set("trust proxy", 1);
 app.use(express.urlencoded({ extended: true }));
 
 // routes middleware
