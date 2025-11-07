@@ -16,6 +16,9 @@ router.post(
   ScheduleController.createSchedule
 );
 
+// Delete routes
+router.delete("/delete/:id", validateToken(UserRole.ADMIN), ScheduleController.deleteSchedule)
+
 // Export schedule routes
 const ScheduleRoutes = router;
 export default ScheduleRoutes;

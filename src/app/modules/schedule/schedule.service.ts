@@ -109,10 +109,22 @@ const createSchedule = async (payload: ISchedule) => {
   return schedules;
 };
 
+// Delete schedule
+const deleteSchedule = async (scheduleId: string) => {
+  const result = await prisma.schedule.delete({
+    where: {
+      id: scheduleId,
+    },
+  });
+
+  return result;
+};
+
 // Schedule service object
 const ScheduleService = {
   getAllSchedules,
   createSchedule,
+  deleteSchedule,
 };
 
 export default ScheduleService;
