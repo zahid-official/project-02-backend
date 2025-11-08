@@ -7,7 +7,6 @@ import UserRoutes from "../modules/user/user.routes";
 import ScheduleRoutes from "../modules/schedule/schedule.routes";
 import DoctorScheduleRoutes from "../modules/doctorSchedule/doctorSchedule.routes";
 import SpecialtiesRoutes from "../modules/specialties/specialties.routes";
-import DoctorSpecialtiesRoutes from "../modules/doctorSpecialties/doctorSpecialties.routes";
 
 // Initialize main router
 const router = Router();
@@ -45,10 +44,6 @@ const moduleRoutes = [
   {
     path: "/specialties",
     route: SpecialtiesRoutes,
-  },
-  {
-    path: "/doctor-specialties",
-    route: DoctorSpecialtiesRoutes,
   },
 ];
 
