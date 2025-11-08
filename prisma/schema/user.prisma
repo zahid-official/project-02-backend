@@ -34,24 +34,25 @@ model Admin {
 
 // Create doctor schema model
 model Doctor {
-    id                  String           @id @default(uuid())
+    id                  String              @id @default(uuid())
     name                String
-    email               String           @unique
+    email               String              @unique
     gender              Gender
     phone               String
     address             String?
     profilePhoto        String?
     registrationNumber  String
     appointmentFee      Int
-    experience          Int              @default(0)
+    experience          Int                 @default(0)
     qualification       String
     designation         String
     currentWorkingPlace String
-    isDeleted           Boolean          @default(false)
-    createdAt           DateTime         @default(now())
-    updatedAt           DateTime         @updatedAt
-    user                User             @relation(fields: [email], references: [email])
+    isDeleted           Boolean             @default(false)
+    createdAt           DateTime            @default(now())
+    updatedAt           DateTime            @updatedAt
+    user                User                @relation(fields: [email], references: [email])
     doctorSchedules     DoctorSchedule[]
+    doctorSpecialties   DoctorSpecialties[]
 
     @@map("doctors")
 }
