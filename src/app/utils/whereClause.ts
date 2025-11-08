@@ -1,6 +1,6 @@
 const whereClause = (
   filterOptions: Record<string, unknown>,
-  searchableFields: string[]
+  searchableFields?: string[]
 ) => {
   const { searchTerm, ...filterableFields } = filterOptions;
   const where = {

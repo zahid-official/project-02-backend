@@ -59,6 +59,12 @@ const globalErrorHandler = (
     message = "Invalid input data for Prisma query";
   }
 
+  // Prisma unknown request error
+  else if (error instanceof Prisma.PrismaClientUnknownRequestError) {
+    statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+    message = "An unknown database error occurred.";
+  }
+
   // Prisma initialization error handling
   else if (error instanceof Prisma.PrismaClientInitializationError) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;

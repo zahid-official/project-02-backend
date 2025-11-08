@@ -5,7 +5,7 @@ import config from "../config";
 // Generate jwt access token
 export const generateAccessToken = (user: Partial<User>) => {
   const payload = {
-    id: user?.id,
+    userId: user?.id,
     email: user?.email,
     role: user?.role,
   } as JwtPayload;
@@ -19,7 +19,7 @@ export const generateAccessToken = (user: Partial<User>) => {
 // Generate jwt refresh token
 export const generateRefreshToken = (user: Partial<User>) => {
   const payload = {
-    id: user?.id,
+    userId: user?.id,
     email: user?.email,
     role: user?.role,
   } as JwtPayload;

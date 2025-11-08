@@ -1,0 +1,7 @@
+// Interface for schedule
+export interface ISchedule {
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+}
