@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
-import { cloudinaryUpload } from "../../config/cloudinary";
 import catchAsync from "../../utils/catchAsync";
+import pickFields from "../../utils/pickFields";
 import sendResponse from "../../utils/sendResponse";
 import ScheduleService from "./schedule.service";
-import pickFields from "../../utils/pickFields";
 
 // Get all schedules
 const getAllSchedules = catchAsync(async (req: Request, res: Response) => {

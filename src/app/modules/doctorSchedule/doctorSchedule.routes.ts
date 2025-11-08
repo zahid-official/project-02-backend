@@ -2,6 +2,8 @@ import { UserRole } from "@prisma/client";
 import { Router } from "express";
 import validateToken from "../../middlewares/validateToken";
 import DoctorScheduleController from "./doctorSchedule.controller";
+import { validateZodSchema } from "../../middlewares/validateZodSchema";
+import { createDoctorScheduleZodSchema } from "./doctorSchedule.validation";
 
 // Initialize router
 const router = Router();
@@ -10,6 +12,7 @@ const router = Router();
 router.post(
   "/create",
   validateToken(UserRole.DOCTOR),
+  validateZodSchema(createDoctorScheduleZodSchema),
   DoctorScheduleController.createDoctorSchedule
 );
 

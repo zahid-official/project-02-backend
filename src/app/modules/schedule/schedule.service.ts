@@ -4,6 +4,8 @@ import prisma from "../../config/prisma";
 import paginationHelper from "../../utils/paginationHelper";
 import { IPagination } from "../user/user.interface";
 import { ISchedule } from "./schedule.interface";
+import AppError from "../../error/AppError";
+import httpStatus from "http-status";
 
 // Get all schedules
 const getAllSchedules = async (
@@ -123,6 +125,14 @@ const createSchedule = async (payload: ISchedule) => {
 
     // Increment date
     startDate.setDate(startDate.getDate() + 1);
+  }
+
+  // If no schedules were created, throw an error
+  if (schedules.length === 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "No new schedules were created. All time slots already exist."
+    );
   }
 
   return schedules;
