@@ -3,6 +3,43 @@ import bcrypt from "bcryptjs";
 import config from "../../config";
 import prisma from "../../config/prisma";
 import { IDoctor } from "./doctor.interface";
+import { IPagination } from "../user/user.interface";
+import paginationHelper from "../../utils/paginationHelper";
+import whereClause from "../../utils/whereClause";
+
+// Get all doctors
+const getAllDoctors = async (
+  paginationOptions: IPagination,
+  filterOptions: Record<string, unknown>
+) => {
+  // Pagination options
+  const { limit, page, skip, sortBy, sortOrder } =
+    paginationHelper(paginationOptions);
+
+  // Filter options
+  const searchableFields = ["name", "email"];
+  const where = whereClause(filterOptions, searchableFields);
+
+  // Find posts
+  const result = await prisma.doctor.findMany({
+    take: limit,
+    skip,
+    where,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+  });
+
+  // pagination data
+  const total = await prisma.user.count();
+  const meta = {
+    limit,
+    page,
+    total,
+  };
+
+  return { data: result, meta };
+};
 
 // Create doctor
 const createDoctor = async (
@@ -34,6 +71,7 @@ const createDoctor = async (
 
 // Doctor service object
 const DoctorService = {
+  getAllDoctors,
   createDoctor,
 };
 
