@@ -5,6 +5,19 @@ import sendResponse from "../../utils/sendResponse";
 import SpecialtiesService from "./specialties.service";
 import { cloudinaryUpload } from "../../config/cloudinary";
 
+// Get specialties
+const getSpecialties = catchAsync(async (req: Request, res: Response) => {
+  const result = await SpecialtiesService.getSpeialties();
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Specialties retrieved successfully",
+    data: result,
+  });
+});
+
 // Create specialties
 const createSpecialties = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
@@ -24,6 +37,7 @@ const createSpecialties = catchAsync(async (req: Request, res: Response) => {
 
 // User controller object
 const SpecialtiesController = {
+  getSpecialties,
   createSpecialties,
 };
 

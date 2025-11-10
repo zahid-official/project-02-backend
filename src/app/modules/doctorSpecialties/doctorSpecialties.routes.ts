@@ -8,6 +8,13 @@ import DoctorSpecialtiesController from "./doctorSpecialties.controller";
 // Initialize router
 const router = Router();
 
+// Get routes
+router.get(
+  "/",
+  validateToken(UserRole.ADMIN),
+  DoctorSpecialtiesController.getDoctorSpeialties
+);
+
 router.post(
   "/create",
   validateToken(UserRole.ADMIN),

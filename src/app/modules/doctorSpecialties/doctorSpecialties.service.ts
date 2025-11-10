@@ -1,7 +1,13 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../config/prisma";
 
-// Create doctorSpecialties
+// Get doctor specialties
+const getDoctorSpeialties = async () => {
+  const result = await prisma.doctorSpecialties.findMany(); 
+  return result;
+};
+
+// Create doctor specialties
 const createDoctorSpecialties = async (
   payload: Prisma.DoctorSpecialtiesCreateInput
 ) => {
@@ -14,6 +20,7 @@ const createDoctorSpecialties = async (
 
 // DoctorSpecialties service object
 const DoctorSpecialtiesService = {
+  getDoctorSpeialties,
   createDoctorSpecialties,
 };
 

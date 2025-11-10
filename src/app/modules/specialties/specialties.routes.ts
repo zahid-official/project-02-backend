@@ -9,6 +9,14 @@ import { UserRole } from "@prisma/client";
 // Initialize router
 const router = Router();
 
+// Get routes
+router.get(
+  "/",
+  validateToken(UserRole.ADMIN),
+  SpecialtiesController.getSpecialties
+);
+
+// Post routes
 router.post(
   "/create",
   validateToken(UserRole.ADMIN),
