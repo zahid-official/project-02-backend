@@ -13,10 +13,15 @@ const getAllDoctors = catchAsync(async (req: Request, res: Response) => {
   const paginationOptions = pickFields(req?.query, paginationQueryKeys);
 
   // Search & Filtering Parameters
-  const filterQueryKeys = ["searchTerm", "name", "email", "gender"];
+  const filterQueryKeys = [
+    "searchTerm",
+    "name",
+    "email",
+    "gender",
+    "doctorSpecialties",
+  ];
   const filterOptions = pickFields(req?.query, filterQueryKeys);
 
-  // console.log(req?.query, filterQueryKeys);
   const result = await DoctorService.getAllDoctors(
     paginationOptions,
     filterOptions

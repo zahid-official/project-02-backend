@@ -1,4 +1,4 @@
-import { Doctor, UserRole } from "@prisma/client";
+import { Doctor, Prisma, UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import config from "../../config";
 import prisma from "../../config/prisma";
@@ -17,8 +17,38 @@ const getAllDoctors = async (
     paginationHelper(paginationOptions);
 
   // Filter options
+  const { searchTerm, doctorSpecialties, ...filterableFields } = filterOptions;
   const searchableFields = ["name", "email"];
-  const where = whereClause(filterOptions, searchableFields);
+  const where: Prisma.DoctorWhereInput = {
+    AND: [
+      // Search by term
+      {
+        OR: searchableFields?.map((field) => ({
+          [field]: {
+            contains: (searchTerm as string) || "",
+            mode: "insensitive",
+          },
+        })),
+      },
+
+      // Search by doctor specialties
+      {
+        doctorSpecialties: {
+          some: {
+            specialties: {
+              title: {
+                contains: (doctorSpecialties as string) || "",
+                mode: "insensitive",
+              },
+            },
+          },
+        },
+      },
+
+      // Filter by exact matches
+      { ...filterableFields },
+    ],
+  };
 
   // Find posts
   const result = await prisma.doctor.findMany({
@@ -28,10 +58,17 @@ const getAllDoctors = async (
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true,
+        },
+      },
+    },
   });
 
   // pagination data
-  const total = await prisma.user.count();
+  const total = await prisma.doctor.count();
   const meta = {
     limit,
     page,
@@ -69,7 +106,7 @@ const createDoctor = async (
   return result;
 };
 
-// Create doctor
+// Update doctor
 const updateDoctor = async (
   payload: Partial<IUpdateDoctor>,
   doctorId: string
