@@ -1,11 +1,12 @@
 import { Doctor, Prisma, UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import httpStatus from "http-status";
 import config from "../../config";
 import prisma from "../../config/prisma";
-import { IDoctor, IUpdateDoctor } from "./doctor.interface";
-import { IPagination } from "../user/user.interface";
+import AppError from "../../error/AppError";
 import paginationHelper from "../../utils/paginationHelper";
-import whereClause from "../../utils/whereClause";
+import { IPagination } from "../user/user.interface";
+import { IDoctor, IUpdateDoctor } from "./doctor.interface";
 
 // Get all doctors
 const getAllDoctors = async (
@@ -19,36 +20,46 @@ const getAllDoctors = async (
   // Filter options
   const { searchTerm, doctorSpecialties, ...filterableFields } = filterOptions;
   const searchableFields = ["name", "email"];
-  const where: Prisma.DoctorWhereInput = {
-    AND: [
-      // Search by term
-      {
-        OR: searchableFields?.map((field) => ({
-          [field]: {
-            contains: (searchTerm as string) || "",
-            mode: "insensitive",
-          },
-        })),
-      },
 
-      // Search by doctor specialties
-      {
-        doctorSpecialties: {
-          some: {
-            specialties: {
-              title: {
-                contains: (doctorSpecialties as string) || "",
-                mode: "insensitive",
-              },
+  const andConditions: Prisma.DoctorWhereInput[] = [];
+  // Search by term
+  if (searchTerm) {
+    andConditions.push({
+      OR: searchableFields?.map((field) => ({
+        [field]: {
+          contains: (searchTerm as string) || "",
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  // Search by doctor specialties
+  if (doctorSpecialties) {
+    andConditions.push({
+      doctorSpecialties: {
+        some: {
+          specialties: {
+            title: {
+              contains: (doctorSpecialties as string) || "",
+              mode: "insensitive",
             },
           },
         },
       },
+    });
+  }
 
-      // Filter by exact matches
-      { ...filterableFields },
-    ],
-  };
+  // Other exact match filters
+  if (Object.keys(filterableFields).length > 0) {
+    andConditions.push({
+      ...filterableFields,
+    });
+  }
+
+  // 🧩 Final where condition
+  const where: Prisma.DoctorWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
 
   // Find posts
   const result = await prisma.doctor.findMany({
@@ -106,6 +117,9 @@ const createDoctor = async (
   return result;
 };
 
+// Doctor ai suggestion
+const doctorAiSuggestion = async (payload: { symptoms: string }) => {};
+
 // Update doctor
 const updateDoctor = async (
   payload: Partial<IUpdateDoctor>,
@@ -120,27 +134,28 @@ const updateDoctor = async (
       const deletableSpecialties = specialties.filter(
         (specialty) => specialty.isDeleted
       );
-      deletableSpecialties?.map(async (deleteSpecialty) => {
+
+      for (const deleteSpecialty of deletableSpecialties) {
         await transactionId.doctorSpecialties.deleteMany({
           where: {
             doctorId,
             specialtiesId: deleteSpecialty.specialtiesId,
           },
         });
-      });
+      }
 
       // Add new specialties to the doctor
       const addableSpecialties = specialties.filter(
         (specialty) => !specialty.isDeleted
       );
-      addableSpecialties?.map(async (addableSpecialty) => {
+      for (const addSpecialty of addableSpecialties) {
         await transactionId.doctorSpecialties.create({
           data: {
             doctorId,
-            specialtiesId: addableSpecialty.specialtiesId,
+            specialtiesId: addSpecialty.specialtiesId,
           },
         });
-      });
+      }
     }
 
     // Update doctor info
@@ -168,6 +183,7 @@ const updateDoctor = async (
 const DoctorService = {
   getAllDoctors,
   createDoctor,
+  doctorAiSuggestion,
   updateDoctor,
 };
 

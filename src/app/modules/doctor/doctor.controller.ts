@@ -55,6 +55,19 @@ const createDoctor = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Doctor ai suggestion
+const doctorAiSuggestion = catchAsync(async (req: Request, res: Response) => {
+  const result = await DoctorService.doctorAiSuggestion(req?.body);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Doctor ai suggestions retrieved successfully",
+    data: result,
+  });
+});
+
 // Update doctor
 const updateDoctor = catchAsync(async (req: Request, res: Response) => {
   const doctorId = req?.params?.id;
@@ -74,6 +87,7 @@ const updateDoctor = catchAsync(async (req: Request, res: Response) => {
 const DoctorController = {
   getAllDoctors,
   createDoctor,
+  doctorAiSuggestion,
   updateDoctor,
 };
 

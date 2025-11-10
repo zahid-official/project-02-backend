@@ -24,6 +24,7 @@ router.post(
   validateZodSchema(createDoctorZodSchema),
   DoctorController.createDoctor
 );
+router.post("/ai-suggestion", DoctorController.doctorAiSuggestion)
 
 // Patch routes
 router.patch("/:id", DoctorController.updateDoctor)
