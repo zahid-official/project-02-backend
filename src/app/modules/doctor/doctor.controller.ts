@@ -50,10 +50,26 @@ const createDoctor = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Update doctor
+const updateDoctor = catchAsync(async (req: Request, res: Response) => {
+  const doctorId = req?.params?.id;
+  const body = req?.body;
+  const result = await DoctorService.updateDoctor(body, doctorId);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Doctor updated successfully",
+    data: result,
+  });
+});
+
 // Doctor controller object
 const DoctorController = {
   getAllDoctors,
   createDoctor,
+  updateDoctor,
 };
 
 export default DoctorController;

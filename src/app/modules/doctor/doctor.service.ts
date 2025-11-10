@@ -2,7 +2,7 @@ import { Doctor, UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import config from "../../config";
 import prisma from "../../config/prisma";
-import { IDoctor } from "./doctor.interface";
+import { IDoctor, IUpdateDoctor } from "./doctor.interface";
 import { IPagination } from "../user/user.interface";
 import paginationHelper from "../../utils/paginationHelper";
 import whereClause from "../../utils/whereClause";
@@ -69,10 +69,69 @@ const createDoctor = async (
   return result;
 };
 
+// Create doctor
+const updateDoctor = async (
+  payload: Partial<IUpdateDoctor>,
+  doctorId: string
+) => {
+  const { specialties, ...doctorInfo } = payload;
+
+  const result = prisma.$transaction(async (transactionId) => {
+    // Update specialties info
+    if (specialties) {
+      // Remove deleted specialties from the doctor
+      const deletableSpecialties = specialties.filter(
+        (specialty) => specialty.isDeleted
+      );
+      deletableSpecialties?.map(async (deleteSpecialty) => {
+        await transactionId.doctorSpecialties.deleteMany({
+          where: {
+            doctorId,
+            specialtiesId: deleteSpecialty.specialtiesId,
+          },
+        });
+      });
+
+      // Add new specialties to the doctor
+      const addableSpecialties = specialties.filter(
+        (specialty) => !specialty.isDeleted
+      );
+      addableSpecialties?.map(async (addableSpecialty) => {
+        await transactionId.doctorSpecialties.create({
+          data: {
+            doctorId,
+            specialtiesId: addableSpecialty.specialtiesId,
+          },
+        });
+      });
+    }
+
+    // Update doctor info
+    const updatedData = await transactionId.doctor.update({
+      where: {
+        id: doctorId,
+      },
+      data: doctorInfo,
+      include: {
+        doctorSpecialties: {
+          include: {
+            specialties: true,
+          },
+        },
+      },
+    });
+
+    return updatedData;
+  });
+
+  return result;
+};
+
 // Doctor service object
 const DoctorService = {
   getAllDoctors,
   createDoctor,
+  updateDoctor,
 };
 
 export default DoctorService;

@@ -25,6 +25,9 @@ router.post(
   DoctorController.createDoctor
 );
 
+// Patch routes
+router.patch("/:id", DoctorController.updateDoctor)
+
 // Export user routes
 const DoctorRoutes = router;
 export default DoctorRoutes;
