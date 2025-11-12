@@ -4,6 +4,19 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import DoctorSpecialtiesService from "./doctorSpecialties.service";
 
+// Get doctor specialties
+const getDoctorSpeialties = catchAsync(async (req: Request, res: Response) => {
+  const result = await DoctorSpecialtiesService.getDoctorSpeialties();
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Doctor specialties retrieved successfully",
+    data: result,
+  });
+});
+
 // Create doctor specialties
 const createDoctorSpecialties = catchAsync(
   async (req: Request, res: Response) => {
@@ -20,8 +33,9 @@ const createDoctorSpecialties = catchAsync(
   }
 );
 
-// Doctor specialties controller object
+// User controller object
 const DoctorSpecialtiesController = {
+  getDoctorSpeialties,
   createDoctorSpecialties,
 };
 
