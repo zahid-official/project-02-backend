@@ -7,7 +7,7 @@ export const validateZodSchema =
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // If the request body contains a 'data' field, parse it as JSON
-      if (req.body.data) {
+      if (req?.body?.data) {
         req.body = JSON.parse(req.body.data);
       }
 
