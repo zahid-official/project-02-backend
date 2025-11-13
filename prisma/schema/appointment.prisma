@@ -1,0 +1,51 @@
+// Create appointment schema
+model Appointment {
+    id                String            @id @default(uuid())
+    patientId         String
+    doctorId          String
+    scheduleId        String
+    meetingId         String
+    paymentStatus     PaymentStatus
+    appointmentStatus AppointmentStatus
+    createdAt         DateTime          @default(now())
+    updatedAt         DateTime          @updatedAt
+    patient           Patient           @relation(fields: [patientId], references: [id])
+    doctor            Doctor            @relation(fields: [doctorId], references: [id])
+    schedule          Schedule          @relation(fields: [scheduleId], references: [id])
+    payments          Payment?
+    prescriptions     Prescription?
+
+    @@map("appointments")
+}
+
+// Create payment schema
+model Payment {
+    id             String        @id @default(uuid())
+    appointmentId  String        @unique
+    transactionId  String        @unique
+    amount         Float
+    paymentStatus  PaymentStatus
+    paymentGateway Json?
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
+    appointment    Appointment   @relation(fields: [appointmentId], references: [id])
+
+    @@map("payments")
+}
+
+// Create prescription schema
+model Prescription {
+    id            String      @id @default(uuid())
+    patientId     String
+    doctorId      String
+    appointmentId String      @unique()
+    instructions  String
+    followUpData  DateTime
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+    patient       Patient     @relation(fields: [patientId], references: [id])
+    doctor        Doctor      @relation(fields: [doctorId], references: [id])
+    appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+    @@map("prescriptions")
+}
