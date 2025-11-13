@@ -7,7 +7,8 @@ import AppointmentService from "./appointment.service";
 // Create appointment
 const createAppointment = catchAsync(async (req: Request, res: Response) => {
   const body = req?.body;
-  const result = await AppointmentService.createAppointment(body);
+  const userEmail = req?.decodedToken?.email;
+  const result = await AppointmentService.createAppointment(userEmail, body);
 
   // Send response
   sendResponse(res, {
