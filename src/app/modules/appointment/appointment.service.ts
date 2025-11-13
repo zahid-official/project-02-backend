@@ -12,7 +12,7 @@ const createAppointment = async (
   });
 
   // Validate doctor existence
-  await prisma.doctor.findUniqueOrThrow({
+  const doctor = await prisma.doctor.findUniqueOrThrow({
     where: { id: payload?.doctorId, isDeleted: false },
   });
 
@@ -39,7 +39,7 @@ const createAppointment = async (
     });
 
     // Update schedule as booked
-    await prisma.doctorSchedule.update({
+    await transactionRoleback.doctorSchedule.update({
       where: {
         scheduleId_doctorId: {
           doctorId: payload?.doctorId,
@@ -48,6 +48,15 @@ const createAppointment = async (
       },
       data: {
         isBooked: true,
+      },
+    });
+
+    // Create payment
+    await transactionRoleback.payment.create({
+      data: {
+        appointmentId: appointment.id,
+        transactionId: uuidv4(),
+        amount: doctor?.appointmentFee,
       },
     });
 
