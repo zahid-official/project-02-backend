@@ -90,6 +90,32 @@ const getAllDoctors = async (
   return { data: result, meta };
 };
 
+// Get single doctor
+const getSingleDoctor = async (doctorId: string) => {
+  const result = await prisma.doctor.findUniqueOrThrow({
+    where: {
+      id: doctorId,
+      isDeleted: false,
+    },
+
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true,
+        },
+      },
+
+      doctorSchedules: {
+        include: {
+          schedule: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
 // Create doctor
 const createDoctor = async (
   payload: IDoctor,
@@ -266,6 +292,7 @@ const updateDoctor = async (
 // Doctor service object
 const DoctorService = {
   getAllDoctors,
+  getSingleDoctor,
   createDoctor,
   doctorAiSuggestion,
   updateDoctor,
