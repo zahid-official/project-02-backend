@@ -1,10 +1,11 @@
 import { PaymentStatus } from "@prisma/client";
-import prisma from "../../config/prisma";
 import Stripe from "stripe";
+import prisma from "../../config/prisma";
 
 // Create payment
 const stripeWebhook = async (event: Stripe.Event) => {
   switch (event.type) {
+    // Handle successful checkout session
     case "checkout.session.completed": {
       const session = event.data.object as any;
       const appointmentId = session.metadata?.appointmentId;
@@ -24,7 +25,7 @@ const stripeWebhook = async (event: Stripe.Event) => {
         });
 
         // Update payment records
-        await prisma.payment.updateMany({
+        await prisma.payment.update({
           where: { id: paymentId },
           data: {
             paymentGateway: session,
@@ -38,6 +39,24 @@ const stripeWebhook = async (event: Stripe.Event) => {
       break;
     }
 
+    // Handle expired checkout session
+    case "checkout.session.expired": {
+      const session = event.data.object as any;
+      const { doctorId, scheduleId } = session.metadata;
+
+      // Release booked slot
+      if (doctorId && scheduleId) {
+        await prisma.doctorSchedule.update({
+          where: {
+            scheduleId_doctorId: { doctorId, scheduleId },
+          },
+          data: { isBooked: false },
+        });
+      }
+      break;
+    }
+
+    // Handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);
   }

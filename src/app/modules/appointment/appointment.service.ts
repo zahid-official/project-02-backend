@@ -74,6 +74,7 @@ const createAppointment = async (
       payment_method_types: ["card"],
       mode: "payment",
       customer_email: patient.email,
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       line_items: [
         {
           price_data: {
