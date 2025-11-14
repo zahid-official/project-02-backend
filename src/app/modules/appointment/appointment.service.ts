@@ -1,5 +1,7 @@
 import prisma from "../../config/prisma";
 import { v4 as uuidv4 } from "uuid";
+import stripe from "../../config/stripe";
+import config from "../../config";
 
 // Create appointment
 const createAppointment = async (
@@ -14,6 +16,13 @@ const createAppointment = async (
   // Validate doctor existence
   const doctor = await prisma.doctor.findUniqueOrThrow({
     where: { id: payload?.doctorId, isDeleted: false },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true,
+        },
+      },
+    },
   });
 
   // Validate schedule availability
@@ -52,7 +61,7 @@ const createAppointment = async (
     });
 
     // Create payment
-    await transactionRoleback.payment.create({
+    const payment = await transactionRoleback.payment.create({
       data: {
         appointmentId: appointment.id,
         transactionId: uuidv4(),
@@ -60,7 +69,37 @@ const createAppointment = async (
       },
     });
 
-    return appointment;
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      customer_email: patient.email,
+      line_items: [
+        {
+          price_data: {
+            currency: "bdt",
+            product_data: {
+              name: `Appointment with Dr. ${doctor.name}`,
+              description: `Consultation for ${
+                doctor.doctorSpecialties?.[0].specialties?.title ?? "General"
+              }`,
+            },
+            unit_amount: Math.round(doctor.appointmentFee * 100), // in cents
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        doctorId: doctor.id,
+        patientId: patient.id,
+        appointmentId: appointment.id,
+        paymentId: payment.id,
+      },
+      success_url: `${config.stripe.success_url}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${config.stripe.cancel_url}`,
+    });
+
+    return { paymentURL: session.url };
   });
 
   return result;
