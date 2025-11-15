@@ -40,7 +40,7 @@ model Prescription {
     doctorId      String
     appointmentId String      @unique()
     instructions  String
-    followUpData  DateTime
+    followUpDate  DateTime?
     createdAt     DateTime    @default(now())
     updatedAt     DateTime    @updatedAt
     patient       Patient     @relation(fields: [patientId], references: [id])
