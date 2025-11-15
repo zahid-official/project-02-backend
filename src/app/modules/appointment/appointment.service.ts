@@ -5,6 +5,8 @@ import config from "../../config";
 import { IPagination } from "../user/user.interface";
 import paginationHelper from "../../utils/paginationHelper";
 import { Prisma, UserRole } from "@prisma/client";
+import httpStatus from "http-status";
+import AppError from "../../error/AppError";
 
 // Get my appointments
 const getMyAppointments = async (
@@ -172,10 +174,39 @@ const createAppointment = async (
   return result;
 };
 
+// Update appointment
+const updateAppointment = async (
+  userEmail: string,
+  appointmentId: string,
+  payload: Partial<Prisma.AppointmentUpdateInput>
+) => {
+  // Validate appointment existence
+  const appointment = await prisma.appointment.findUniqueOrThrow({
+    where: { id: appointmentId },
+    include: { doctor: true },
+  });
+
+  if (userEmail !== appointment.doctor.email) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You are not authorized to update this appointment"
+    );
+  }
+
+  // Update appointment
+  const result = await prisma.appointment.update({
+    where: { id: appointmentId },
+    data: payload,
+  });
+
+  return result;
+};
+
 // Appointment service object
 const AppointmentService = {
   getMyAppointments,
   createAppointment,
+  updateAppointment,
 };
 
 export default AppointmentService;

@@ -48,10 +48,31 @@ const createAppointment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Update appointment
+const updateAppointment = catchAsync(async (req: Request, res: Response) => {
+  const body = req?.body;
+  const { appointmentId } = req?.params;
+  const userEmail = req?.decodedToken?.email;
+
+  const result = await AppointmentService.updateAppointment(
+    userEmail,
+    appointmentId,
+    body
+  );
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Appointment updated successfully",
+    data: result,
+  });
+});
+
 // Appointment controller object
 const AppointmentController = {
   getMyAppointments,
   createAppointment,
+  updateAppointment,
 };
 
 export default AppointmentController;

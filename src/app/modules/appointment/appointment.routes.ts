@@ -20,6 +20,13 @@ router.post(
   AppointmentController.createAppointment
 );
 
+// Patch routes
+router.patch(
+  "/:appointmentId",
+  validateToken(UserRole.DOCTOR),
+  AppointmentController.updateAppointment
+);
+
 // Export appointment routes
 const AppointmentRoutes = router;
 export default AppointmentRoutes;
