@@ -37,6 +37,20 @@ const getAllDoctors = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get single doctors
+const getSingleDoctor = catchAsync(async (req: Request, res: Response) => {
+  const doctorId = req?.params?.id;
+  const result = await DoctorService.getSingleDoctor(doctorId);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Doctor retrieved successfully",
+    data: result,
+  });
+});
+
 // Create doctor
 const createDoctor = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
@@ -86,6 +100,7 @@ const updateDoctor = catchAsync(async (req: Request, res: Response) => {
 // Doctor controller object
 const DoctorController = {
   getAllDoctors,
+  getSingleDoctor,
   createDoctor,
   doctorAiSuggestion,
   updateDoctor,

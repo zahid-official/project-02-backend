@@ -5,9 +5,17 @@ import notFound from "./app/middlewares/notFound";
 import config from "./app/config";
 import ModuleRouter from "./app/routes";
 import cookieParser from "cookie-parser";
+import PaymentController from "./app/modules/payment/payment.controller";
 
 // Express application
 const app: Application = express();
+
+// Stripe webhook route
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  PaymentController.stripeWebhook
+);
 
 // Middlewares
 app.use(
