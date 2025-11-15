@@ -12,8 +12,13 @@ const router = Router();
 // Get routes
 router.get(
   "/",
-  validateToken(...Object.values(UserRole)),
+  validateToken(UserRole.ADMIN, UserRole.DOCTOR),
   DoctorController.getAllDoctors
+);
+router.get(
+  "/singleDoctor/:id",
+  validateToken(UserRole.ADMIN, UserRole.DOCTOR),
+  DoctorController.getSingleDoctor
 );
 
 // Post routes
@@ -24,10 +29,10 @@ router.post(
   validateZodSchema(createDoctorZodSchema),
   DoctorController.createDoctor
 );
-router.post("/ai-suggestion", DoctorController.doctorAiSuggestion)
+router.post("/ai-suggestion", DoctorController.doctorAiSuggestion);
 
 // Patch routes
-router.patch("/:id", DoctorController.updateDoctor)
+router.patch("/:id", DoctorController.updateDoctor);
 
 // Export user routes
 const DoctorRoutes = router;

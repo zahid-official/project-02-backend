@@ -23,4 +23,10 @@ export default {
   open_router: {
     api_key: process.env.OPENROUTER_API_KEY,
   },
+  stripe: {
+    secret_key: process.env.STRIPE_SECRET_KEY,
+    success_url: process.env.STRIPE_SUCCESS_FRONTEND_URL,
+    cancel_url: process.env.STRIPE_CANCELED_FRONTEND_URL,
+    webhook_secret: process.env.STRIPE_WEBHOOK_SECRET_KEY,
+  },
 };
