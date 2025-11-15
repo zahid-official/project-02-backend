@@ -6,6 +6,13 @@ import { UserRole } from "@prisma/client";
 // Initialize router
 const router = Router();
 
+// Get routes
+router.get(
+  "/my-appointments",
+  validateToken(UserRole.PATIENT, UserRole.DOCTOR),
+  AppointmentController.getMyAppointments
+);
+
 // Post routes
 router.post(
   "/create",

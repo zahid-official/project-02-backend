@@ -2,6 +2,71 @@ import prisma from "../../config/prisma";
 import { v4 as uuidv4 } from "uuid";
 import stripe from "../../config/stripe";
 import config from "../../config";
+import { IPagination } from "../user/user.interface";
+import paginationHelper from "../../utils/paginationHelper";
+import { Prisma, UserRole } from "@prisma/client";
+
+// Get my appointments
+const getMyAppointments = async (
+  userRole: string,
+  userEmail: string,
+  paginationOptions: IPagination,
+  filterOptions: Record<string, unknown>
+) => {
+  // Pagination options
+  const { limit, page, skip, sortBy, sortOrder } =
+    paginationHelper(paginationOptions);
+
+  // Filter options
+  const { ...filterableFields } = filterOptions;
+  const andConditions: Prisma.AppointmentWhereInput[] = [];
+  // Apply role-based filters
+  if (userRole === UserRole.PATIENT) {
+    andConditions.push({
+      patient: { email: userEmail },
+    });
+  }
+
+  // Apply role-based filters
+  if (userRole === UserRole.DOCTOR) {
+    andConditions.push({
+      doctor: { email: userEmail },
+    });
+  }
+
+  // Other exact match filters
+  if (Object.keys(filterableFields).length > 0) {
+    andConditions.push({
+      ...filterableFields,
+    });
+  }
+
+  // 🧩 Final where condition
+  const where: Prisma.AppointmentWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  // Fetch appointments
+  const result = await prisma.appointment.findMany({
+    take: limit,
+    skip,
+    where,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include:
+      userRole === UserRole.DOCTOR ? { patient: true } : { doctor: true },
+  });
+
+  // pagination data
+  const total = await prisma.appointment.count({ where });
+  const meta = {
+    limit,
+    page,
+    total,
+  };
+
+  return { data: result, meta };
+};
 
 // Create appointment
 const createAppointment = async (
@@ -48,7 +113,7 @@ const createAppointment = async (
     });
 
     // Update schedule as booked
-    await transactionRoleback.doctorSchedule.update({
+    const doctorSchedule = await transactionRoleback.doctorSchedule.update({
       where: {
         scheduleId_doctorId: {
           doctorId: payload?.doctorId,
@@ -95,6 +160,7 @@ const createAppointment = async (
         patientId: patient.id,
         appointmentId: appointment.id,
         paymentId: payment.id,
+        scheduleId: doctorSchedule.scheduleId,
       },
       success_url: `${config.stripe.success_url}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${config.stripe.cancel_url}`,
@@ -108,6 +174,7 @@ const createAppointment = async (
 
 // Appointment service object
 const AppointmentService = {
+  getMyAppointments,
   createAppointment,
 };
 
