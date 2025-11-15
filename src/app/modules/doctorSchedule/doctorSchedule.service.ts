@@ -1,5 +1,11 @@
 import prisma from "../../config/prisma";
 
+// Get all doctor schedules
+const getAllDoctorSchedules = async () => {
+  const result = await prisma.doctorSchedule.findMany();
+  return result;
+};
+
 // Create doctor schedule
 const createDoctorSchedule = async (
   doctorEmail: string,
@@ -25,6 +31,7 @@ const createDoctorSchedule = async (
 
 // Doctor schedule service object
 const DoctorScheduleService = {
+  getAllDoctorSchedules,
   createDoctorSchedule,
 };
 

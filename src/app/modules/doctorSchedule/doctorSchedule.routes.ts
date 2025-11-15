@@ -8,6 +8,13 @@ import { createDoctorScheduleZodSchema } from "./doctorSchedule.validation";
 // Initialize router
 const router = Router();
 
+// Get routes
+router.get(
+  "/",
+  validateToken(UserRole.DOCTOR, UserRole.PATIENT),
+  DoctorScheduleController.getAllDoctorSchedules
+);
+
 // Post routes
 router.post(
   "/create",
