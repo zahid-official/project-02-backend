@@ -1,0 +1,39 @@
+// Create patient health schema
+model HealthRecord {
+    id                  String        @id @default(uuid())
+    patientId           String
+    gender              Gender
+    height              String
+    weight              String
+    birthDate           DateTime
+    bloodGroup          BloodGroup
+    dietaryPreferences  String?
+    mentalHealthHistory String?
+    immunizationStatus  String?
+    hasAllergies        Boolean?      @default(false)
+    hasDiabetes         Boolean?      @default(false)
+    smokingStatus       Boolean?      @default(false)
+    pregnancyStatus     Boolean?      @default(false)
+    hasPastSurgeries    Boolean?      @default(false)
+    recentAnxiety       Boolean?      @default(false)
+    recentDepression    Boolean?      @default(false)
+    maritalStatus       MaritalStatus @default(UNMARRIED)
+    createdAt           DateTime      @default(now())
+    updatedAt           DateTime      @updatedAt
+    patient             Patient       @relation(fields: [patientId], references: [id])
+
+    @@map("health_records")
+}
+
+// Create medical report schema
+model MedicalReport {
+    id         String   @id @default(uuid())
+    patientId  String
+    reportName String
+    reportLink String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    patient    Patient  @relation(fields: [patientId], references: [id])
+
+    @@map("medical_reports")
+}
