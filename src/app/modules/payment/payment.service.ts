@@ -5,12 +5,12 @@ import prisma from "../../config/prisma";
 // Create payment
 const stripeWebhook = async (event: Stripe.Event) => {
   switch (event.type) {
-    // Handle successful checkout session
+    // Handle completed checkout session
     case "checkout.session.completed": {
       const session = event.data.object as any;
       const appointmentId = session.metadata?.appointmentId;
       const paymentId = session.metadata?.paymentId;
-      const paymentStatus = session.payment_status;
+      const paymentStatus = session?.payment_status;
 
       if (paymentId && appointmentId) {
         // Update appointment records
@@ -42,43 +42,48 @@ const stripeWebhook = async (event: Stripe.Event) => {
     // Handle expired checkout session
     case "checkout.session.expired": {
       const session = event.data.object as any;
-      const { doctorId, scheduleId, appointmentId, paymentId } =
-        session.metadata;
+      const doctorId = session.metadata?.doctorId;
+      const scheduleId = session.metadata?.scheduleId;
+      const paymentId = session.metadata?.paymentId;
+      const appointmentId = session.metadata?.appointmentId;
 
       // Release booked slot
-      if (doctorId && scheduleId && appointmentId && paymentId) {
-        await prisma.$transaction(async (tx) => {
-          // Delete appointment record
-          await tx.appointment.delete({
-            where: {
-              id: appointmentId,
-              paymentStatus: PaymentStatus.UNPAID,
-            },
-          });
-
-          // Delete payment record
+      await prisma.$transaction(async (tx) => {
+        // Delete payment record
+        if (paymentId) {
           await tx.payment.delete({
             where: {
               id: paymentId,
-              paymentStatus: PaymentStatus.UNPAID,
             },
           });
+        }
 
-          // Update isBooked status
+        // Delete appointment record
+        if (appointmentId) {
+          await tx.appointment.delete({
+            where: {
+              id: appointmentId,
+            },
+          });
+        }
+
+        // Update isBooked status
+        if (doctorId && scheduleId) {
           await tx.doctorSchedule.update({
             where: {
               scheduleId_doctorId: { doctorId, scheduleId },
             },
             data: { isBooked: false },
           });
-        });
-      }
+        }
+      });
+
       break;
     }
 
     // Handle other event types
     default:
-      console.log(`Unhandled event type ${event.type}`);
+      break;
   }
 
   return { paymentReceived: true };
