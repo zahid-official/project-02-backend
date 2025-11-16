@@ -23,9 +23,24 @@ const createPatient = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Update patient
+const updatePatient = catchAsync(async (req: Request, res: Response) => {
+  const userEmail = req?.decodedToken?.email;
+  const body = req?.body;
+  const result = await PatientService.updatePatient(userEmail, body);
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Patient updated successfully",
+    data: result,
+  });
+});
+
 // Patient controller object
 const PatientController = {
   createPatient,
+  updatePatient,
 };
 
 export default PatientController;
