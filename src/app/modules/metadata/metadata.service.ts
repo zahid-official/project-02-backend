@@ -24,6 +24,34 @@ const getMetadata = async (userRole: string) => {
   return metadata;
 };
 
+// Bar chart data
+const barChart = async () => {
+  const result = await prisma.$queryRaw`
+        SELECT DATE_TRUNC('month', "createdAt") AS month,
+        CAST(COUNT(*) AS INTEGER) AS count
+        FROM "appointments"
+        GROUP BY month
+        ORDER BY month ASC;
+    `;
+
+  return result;
+};
+
+// Pie chart data
+const pieChart = async () => {
+  const appointmentChart = await prisma.appointment.groupBy({
+    by: ["appointmentStatus"],
+    _count: { appointmentStatus: true },
+  });
+
+  const result = appointmentChart.map(({ appointmentStatus, _count }) => ({
+    appointmentStatus,
+    count: _count.appointmentStatus,
+  }));
+
+  return result;
+};
+
 // Admin metadata
 const adminMetadata = async () => {
   const adminsCount = await prisma.admin.count();
@@ -35,6 +63,9 @@ const adminMetadata = async () => {
     _sum: { amount: true },
   });
 
+  const barChartData = await barChart();
+  const pieChartData = await pieChart();
+
   // Construct metadata object
   const metadata = {
     adminsCount,
@@ -43,6 +74,8 @@ const adminMetadata = async () => {
     appointmentsCount,
     paymentsCount,
     totalRevenue: totalRevenue._sum.amount || 0,
+    barChartData,
+    pieChartData,
   };
 
   return { message: "Admin metadata retrieved successfully", metadata };
@@ -52,7 +85,10 @@ const adminMetadata = async () => {
 const doctorMetadata = async () => {};
 
 // Patient metadata
-const patientMetadata = async () => {};
+const patientMetadata = async () => {
+  const metadata = {};
+  return { message: "Patient metadata retrieved successfully", metadata };
+};
 
 // Metadata service object
 const MetadataService = {
