@@ -8,6 +8,11 @@ const router = Router();
 
 // Get routes
 router.get("/", validateToken(UserRole.ADMIN), UserController.getAllUsers);
+router.get(
+  "/me",
+  validateToken(...Object.values(UserRole)),
+  UserController.getMe
+);
 
 // Export user routes
 const UserRoutes = router;
