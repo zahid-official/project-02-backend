@@ -1,8 +1,8 @@
-import { Prisma } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import prisma from "../../config/prisma";
 import paginationHelper from "../../utils/paginationHelper";
-import { IPagination } from "./user.interface";
 import whereClause from "../../utils/whereClause";
+import { IPagination } from "./user.interface";
 
 // Get all users
 const getAllUsers = async (
@@ -38,9 +38,46 @@ const getAllUsers = async (
   return { data: result, meta };
 };
 
+// Get logged-in user
+const getMe = async (userEmail: string, userRole: string) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { email: userEmail },
+    select: {
+      email: true,
+      role: true,
+      status: true,
+      needChangePassword: true,
+    },
+  });
+
+  // Fetch role-specific profile data
+  let profileData;
+  if (userRole === UserRole.ADMIN) {
+    profileData = await prisma.admin.findUnique({
+      where: { email: user.email },
+    });
+  }
+  if (userRole === UserRole.DOCTOR) {
+    profileData = await prisma.doctor.findUnique({
+      where: { email: user.email },
+    });
+  }
+  if (userRole === UserRole.PATIENT) {
+    profileData = await prisma.patient.findUnique({
+      where: { email: user.email },
+    });
+  }
+
+  return {
+    ...user,
+    ...profileData,
+  };
+};
+
 // User service object
 const UserService = {
   getAllUsers,
+  getMe,
 };
 
 export default UserService;

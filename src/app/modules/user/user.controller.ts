@@ -30,9 +30,25 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get logged-in user
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const userEmail = req.decodedToken?.email;
+  const userRole = req.decodedToken?.role;
+  const result = await UserService.getMe(userEmail, userRole);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User retrieved successfully",
+    data: result,
+  });
+});
+
 // User controller object
 const UserController = {
   getAllUsers,
+  getMe,
 };
 
 export default UserController;

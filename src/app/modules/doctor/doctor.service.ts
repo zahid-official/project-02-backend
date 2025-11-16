@@ -76,6 +76,9 @@ const getAllDoctors = async (
           specialties: true,
         },
       },
+      reviews: {
+        select: { rating: true },
+      },
     },
   });
 
@@ -110,6 +113,8 @@ const getSingleDoctor = async (doctorId: string) => {
           schedule: true,
         },
       },
+
+      reviews: true,
     },
   });
 

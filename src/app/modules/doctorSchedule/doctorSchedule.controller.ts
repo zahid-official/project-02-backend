@@ -12,8 +12,13 @@ const getAllDoctorSchedules = catchAsync(
     const paginationQueryKeys = ["limit", "page", "sortBy", "sortOrder"];
     const paginationOptions = pickFields(req?.query, paginationQueryKeys);
 
+    // Search & Filtering Parameters
+    const filterQueryKeys = ["isBooked"];
+    const filterOptions = pickFields(req?.query, filterQueryKeys);
+
     const result = await DoctorScheduleService.getAllDoctorSchedules(
-      paginationOptions
+      paginationOptions,
+      filterOptions
     );
     // Send response
     sendResponse(res, {
