@@ -1,10 +1,10 @@
-import { UserRole } from "@prisma/client";
+import { PaymentStatus, UserRole } from "@prisma/client";
 import prisma from "../../config/prisma";
 import AppError from "../../error/AppError";
 import httpstatus from "http-status";
 
 // Get metadata
-const getMetadata = async (userRole: string) => {
+const getMetadata = async (userEmail: string, userRole: string) => {
   let metadata;
   switch (userRole) {
     case UserRole.ADMIN:
@@ -12,10 +12,10 @@ const getMetadata = async (userRole: string) => {
       break;
 
     case UserRole.DOCTOR:
-      metadata = await doctorMetadata();
+      metadata = await doctorMetadata(userEmail);
       break;
     case UserRole.PATIENT:
-      metadata = await patientMetadata();
+      metadata = await patientMetadata(userEmail);
       break;
     default:
       throw new AppError(httpstatus.FORBIDDEN, "Invalid user role");
@@ -82,10 +82,62 @@ const adminMetadata = async () => {
 };
 
 // Doctor metadata
-const doctorMetadata = async () => {};
+const doctorMetadata = async (userEmail: string) => {
+  // Patients count grouped by id
+  const patientsCountData = await prisma.patient.groupBy({
+    by: ["id"],
+    _count: { id: true },
+  });
+  const patientsCount = patientsCountData?.map(({ id, _count }) => ({
+    id,
+    count: _count.id,
+  }));
+
+  // Appointment status count
+  const appointmentStatusData = await prisma.appointment.groupBy({
+    by: ["appointmentStatus"],
+    where: { doctor: { email: userEmail } },
+    _count: { appointmentStatus: true },
+  });
+  const appointmentStatus = appointmentStatusData?.map(
+    ({ appointmentStatus, _count }) => ({
+      appointmentStatus,
+      count: _count.appointmentStatus,
+    })
+  );
+
+  const appointmentsCount = await prisma.appointment.count({
+    where: { doctor: { email: userEmail } },
+  });
+
+  // Review count
+  const reviewCount = await prisma.review.count({
+    where: { doctor: { email: userEmail } },
+  });
+
+  // Total revenue
+  const totalRevenue = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    where: {
+      appointment: {
+        doctor: { email: userEmail },
+        paymentStatus: PaymentStatus.PAID,
+      },
+    },
+  });
+
+  const metadata = {
+    patientsCount,
+    appointmentStatus,
+    appointmentsCount,
+    reviewCount,
+    totalRevenue: totalRevenue._sum.amount || 0,
+  };
+  return { message: "Doctor metadata retrieved successfully", metadata };
+};
 
 // Patient metadata
-const patientMetadata = async () => {
+const patientMetadata = async (userEmail: string) => {
   const metadata = {};
   return { message: "Patient metadata retrieved successfully", metadata };
 };

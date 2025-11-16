@@ -7,8 +7,9 @@ import MetadataService from "./metadata.service";
 
 // Get metadata
 const getMetadata = catchAsync(async (req: Request, res: Response) => {
+  const userEmail = req.decodedToken?.email;
   const userRole = req.decodedToken?.role;
-  const result = await MetadataService.getMetadata(userRole);
+  const result = await MetadataService.getMetadata(userEmail, userRole);
 
   // Send response
   sendResponse(res, {
