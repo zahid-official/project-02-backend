@@ -1,11 +1,11 @@
 // Create patient health schema
 model HealthRecord {
     id                  String        @id @default(uuid())
-    patientId           String
+    patientId           String        @unique
     gender              Gender
     height              String
     weight              String
-    birthDate           DateTime
+    dateOfBirth           DateTime
     bloodGroup          BloodGroup
     dietaryPreferences  String?
     mentalHealthHistory String?

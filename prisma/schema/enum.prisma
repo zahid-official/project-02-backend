@@ -35,14 +35,14 @@ enum PaymentStatus {
 
 // Enum for Blood Group
 enum BloodGroup {
-    A_POSITIVE  @map("A+")
-    A_NEGATIVE  @map("A-")
-    B_POSITIVE  @map("B+")
-    B_NEGATIVE  @map("B-")
-    AB_POSITIVE @map("AB+")
-    AB_NEGATIVE @map("AB-")
-    O_POSITIVE  @map("O+")
-    O_NEGATIVE  @map("O-")
+    A_POSITIVE
+    A_NEGATIVE
+    B_POSITIVE
+    B_NEGATIVE
+    AB_POSITIVE
+    AB_NEGATIVE
+    O_POSITIVE
+    O_NEGATIVE
 }
 
 // Enum for marital status
