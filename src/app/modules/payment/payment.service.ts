@@ -42,15 +42,35 @@ const stripeWebhook = async (event: Stripe.Event) => {
     // Handle expired checkout session
     case "checkout.session.expired": {
       const session = event.data.object as any;
-      const { doctorId, scheduleId } = session.metadata;
+      const { doctorId, scheduleId, appointmentId, paymentId } =
+        session.metadata;
 
       // Release booked slot
-      if (doctorId && scheduleId) {
-        await prisma.doctorSchedule.update({
-          where: {
-            scheduleId_doctorId: { doctorId, scheduleId },
-          },
-          data: { isBooked: false },
+      if (doctorId && scheduleId && appointmentId && paymentId) {
+        await prisma.$transaction(async (tx) => {
+          // Delete appointment record
+          await tx.appointment.delete({
+            where: {
+              id: appointmentId,
+              paymentStatus: PaymentStatus.UNPAID,
+            },
+          });
+
+          // Delete payment record
+          await tx.payment.delete({
+            where: {
+              id: paymentId,
+              paymentStatus: PaymentStatus.UNPAID,
+            },
+          });
+
+          // Update isBooked status
+          await tx.doctorSchedule.update({
+            where: {
+              scheduleId_doctorId: { doctorId, scheduleId },
+            },
+            data: { isBooked: false },
+          });
         });
       }
       break;
