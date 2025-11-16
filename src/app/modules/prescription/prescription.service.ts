@@ -2,7 +2,53 @@ import { AppointmentStatus, PaymentStatus, Prisma } from "@prisma/client";
 import prisma from "../../config/prisma";
 import AppError from "../../error/AppError";
 import httpStatus from "http-status";
+import { IPagination } from "../user/user.interface";
+import paginationHelper from "../../utils/paginationHelper";
 
+// Get all prescriptions
+const getAllPrescriptions = async (
+  userEmail: string,
+  paginationOptions: IPagination
+) => {
+  // Pagination options
+  const { limit, page, skip, sortBy, sortOrder } =
+    paginationHelper(paginationOptions);
+
+  // Where condition
+  const where: Prisma.PrescriptionWhereInput = {
+    patient: {
+      email: userEmail,
+      isDeleted: false,
+    },
+  };
+
+  // Find prescriptions
+  const result = await prisma.prescription.findMany({
+    where,
+    take: limit,
+    skip,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      patient: true,
+      doctor: true,
+      appointment: true,
+    },
+  });
+
+  // / pagination data
+  const total = await prisma.prescription.count({ where });
+  const meta = {
+    limit,
+    page,
+    total,
+  };
+
+  return { data: result, meta };
+};
+
+// Create prescriptions
 const createPrescription = async (
   userEmail: string,
   payload: {
@@ -42,6 +88,7 @@ const createPrescription = async (
 
 // Prescription service object
 const PrescriptionService = {
+  getAllPrescriptions,
   createPrescription,
 };
 
