@@ -138,7 +138,43 @@ const doctorMetadata = async (userEmail: string) => {
 
 // Patient metadata
 const patientMetadata = async (userEmail: string) => {
-  const metadata = {};
+  // Appointment status count
+  const appointmentStatusData = await prisma.appointment.groupBy({
+    by: ["appointmentStatus"],
+    where: { patient: { email: userEmail } },
+    _count: { appointmentStatus: true },
+  });
+  const appointmentStatus = appointmentStatusData?.map(
+    ({ appointmentStatus, _count }) => ({
+      appointmentStatus,
+      count: _count.appointmentStatus,
+    })
+  );
+
+  const appointmentsCount = await prisma.appointment.count({
+    where: { patient: { email: userEmail } },
+  });
+
+  // Prescription count
+  const prescriptionCount = await prisma.prescription.count({
+    where: {
+      appointment: {
+        patient: { email: userEmail },
+      },
+    },
+  });
+
+  // Review count
+  const reviewCount = await prisma.review.count({
+    where: { patient: { email: userEmail } },
+  });
+
+  const metadata = {
+    appointmentStatus,
+    appointmentsCount,
+    prescriptionCount,
+    reviewCount,
+  };
   return { message: "Patient metadata retrieved successfully", metadata };
 };
 
