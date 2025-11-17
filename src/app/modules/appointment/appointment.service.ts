@@ -114,6 +114,15 @@ const createAppointment = async (
       data: appointmentData,
     });
 
+    // Create payment
+    const payment = await transactionRoleback.payment.create({
+      data: {
+        appointmentId: appointment.id,
+        transactionId: uuidv4(),
+        amount: doctor?.appointmentFee,
+      },
+    });
+
     // Update schedule as booked
     const doctorSchedule = await transactionRoleback.doctorSchedule.update({
       where: {
@@ -124,15 +133,6 @@ const createAppointment = async (
       },
       data: {
         isBooked: true,
-      },
-    });
-
-    // Create payment
-    const payment = await transactionRoleback.payment.create({
-      data: {
-        appointmentId: appointment.id,
-        transactionId: uuidv4(),
-        amount: doctor?.appointmentFee,
       },
     });
 
@@ -160,8 +160,8 @@ const createAppointment = async (
       metadata: {
         doctorId: doctor.id,
         patientId: patient.id,
-        appointmentId: appointment.id,
         paymentId: payment.id,
+        appointmentId: appointment.id,
         scheduleId: doctorSchedule.scheduleId,
       },
       success_url: `${config.stripe.success_url}?session_id={CHECKOUT_SESSION_ID}`,
