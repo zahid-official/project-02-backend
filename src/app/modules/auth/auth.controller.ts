@@ -4,6 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import AuthService from "./auth.service";
 import { setCookies } from "../../utils/cookies";
+import defaultAdmin from "../../utils/defaultAdmin";
 
 // Login
 const login = catchAsync(async (req: Request, res: Response) => {
@@ -21,9 +22,21 @@ const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Create default admin
+const createDefaultAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await defaultAdmin();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Default admin created successfully",
+    data: result,
+  });
+});
+
 // Auth controller object
 const AuthController = {
   login,
+  createDefaultAdmin,
 };
 
 export default AuthController;
