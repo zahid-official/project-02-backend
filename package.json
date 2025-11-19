@@ -5,7 +5,11 @@
   "author": "zahid",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "build": "tsc",
+    "start": "node ./dist/server.js",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "schema": "./prisma/schema"
@@ -23,6 +27,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "openai": "^6.8.1",
+    "shortid": "^2.2.17",
     "stripe": "^19.3.1",
     "uuid": "^13.0.0",
     "zod": "^4.1.12"
@@ -34,6 +39,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.5.0",
+    "@types/shortid": "^2.2.0",
     "prisma": "^6.18.0",
     "typescript": "^5.9.2"
   }

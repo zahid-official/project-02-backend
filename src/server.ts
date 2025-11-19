@@ -1,6 +1,7 @@
 import { Server } from "http";
 import app from "./app";
 import config from "./app/config";
+import defaultAdmin from "./app/utils/defaultAdmin";
 
 async function bootstrap() {
   // This variable will hold our server instance
@@ -46,3 +47,4 @@ async function bootstrap() {
 }
 
 bootstrap();
+defaultAdmin();

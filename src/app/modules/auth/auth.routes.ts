@@ -8,6 +8,7 @@ const router = Router();
 
 // Post routes
 router.post("/login", validateZodSchema(loginZodSchema), AuthController.login);
+router.post("/default-admin", AuthController.createDefaultAdmin);
 
 // Export auth routes
 const AuthRoutes = router;
