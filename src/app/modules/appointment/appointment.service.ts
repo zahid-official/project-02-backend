@@ -1,5 +1,5 @@
 import prisma from "../../config/prisma";
-import { v4 as uuidv4 } from "uuid";
+import shortid from "shortid";
 import stripe from "../../config/stripe";
 import config from "../../config";
 import { IPagination } from "../user/user.interface";
@@ -106,7 +106,7 @@ const createAppointment = async (
       patientId: patient?.id,
       doctorId: payload?.doctorId,
       scheduleId: payload?.scheduleId,
-      meetingId: uuidv4(),
+      meetingId: shortid.generate(),
     };
 
     // Create appointment
@@ -118,7 +118,7 @@ const createAppointment = async (
     const payment = await transactionRoleback.payment.create({
       data: {
         appointmentId: appointment.id,
-        transactionId: uuidv4(),
+        transactionId: shortid.generate(),
         amount: doctor?.appointmentFee,
       },
     });
